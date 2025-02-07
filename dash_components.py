@@ -161,52 +161,110 @@ def create_market_parameters_inputs():
 def create_single_option_analysis_tab():
     """Create the layout for the Single Option Analysis tab."""
     return html.Div([
-        html.H3('Single Option Analysis', style={'color': '#2c3e50'}),
+        # Main content area with graphs
         html.Div([
-            create_parameter_input("St/K Ratio:", 'stk-ratio', 1),
-            create_parameter_input("Time to Maturity (T-t):", 'time-remaining', 1),
-            create_parameter_input("Volatility (σ):", 'sigma', 0.2),
-            create_parameter_input("Risk Free Rate (r):", 'r', 0.05)
-        ], style=INPUT_CONTAINER_STYLE),
-        html.Button(
-            'Update Option Analysis',
-            id='update-option',
-            n_clicks=0,
-            style=BUTTON_STYLE
-        ),
+            html.H3('Single Option Analysis', style={'color': '#2c3e50'}),
+            html.Button(
+                'Update Option Analysis',
+                id='update-option',
+                n_clicks=0,
+                style=BUTTON_STYLE
+            ),
+            html.Div([
+                dcc.Graph(id='graph-ncdf-diff', style={'height': '37vh'}),
+                dcc.Graph(id='graph-ncdf-ratio', style={'height': '37vh'})
+            ])
+        ], style={'flex': '4', 'margin-right': '20px'}),
+        
+        # Sidebar with parameters
         html.Div([
-            dcc.Graph(id='graph-ncdf-diff'),
-            dcc.Graph(id='graph-ncdf-ratio')
-        ])
-    ])
+            html.Div([
+                html.H4('Analysis Parameters', style={'color': '#34495e', 'margin-bottom': '15px'}),
+                create_parameter_input("St/K Ratio:", 'stk-ratio', 1),
+                create_parameter_input("Time to Maturity (T-t):", 'time-remaining', 1),
+                create_parameter_input("Volatility (σ):", 'sigma', 0.2),
+                create_parameter_input("Risk Free Rate (r):", 'r', 0.05)
+            ], style={
+                **INPUT_CONTAINER_STYLE,
+                'position': 'sticky',
+                'top': '20px'
+            })
+        ], style={
+            'flex': '1',
+            'min-width': '200px',
+            'max-width': '300px',
+            'margin-top': '60px'  # Align with content below main heading
+        })
+    ], style={
+        'display': 'flex',
+        'flex-direction': 'row',
+        'gap': '10px',
+        'align-items': 'flex-start',
+        'width': '100%',
+        'height': '100%'
+    })
 
 def create_option_greeks_tab():
     """Create the layout for the Option Greeks tab."""
     return html.Div([
-        html.H3('Option Greeks', style={'color': '#2c3e50'}),
+        # Main content area with Greeks output
         html.Div([
-            create_parameter_input("Underlying Price (S):", 'greek-underlying', 100),
-            create_parameter_input("Strike Price (K):", 'greek-strike', 100),
-            create_parameter_input("Time to Maturity (T):", 'greek-time-maturity', 1),
-            create_parameter_input("Current Time (t):", 'greek-current-time', 0),
-            create_parameter_input("Volatility (σ):", 'greek-volatility', 0.2),
-            create_parameter_input("Risk Free Rate (r):", 'greek-risk-free', 0.05),
-            html.Label("Option Type:", style={'font-weight': 'bold', 'margin': '5px 0'}),
-            dcc.Dropdown(
-                id='greek-option-type',
-                options=[
-                    {'label': 'Call', 'value': 'call'},
-                    {'label': 'Put', 'value': 'put'}
-                ],
-                value='call',
-                style={'margin': '5px 0'}
+            html.H3('Option Greeks', style={'color': '#2c3e50'}),
+            html.Button(
+                'Compute Greeks',
+                id='compute-greeks',
+                n_clicks=0,
+                style=BUTTON_STYLE
+            ),
+            html.Div(
+                id='greeks-output',
+                style={
+                    'margin': '20px 0',
+                    'padding': '20px',
+                    'background': 'white',
+                    'border-radius': '8px',
+                    'box-shadow': '0 2px 4px rgba(0,0,0,0.1)',
+                    'min-height': '75vh'
+                }
             )
-        ], style=INPUT_CONTAINER_STYLE),
-        html.Button(
-            'Compute Greeks',
-            id='compute-greeks',
-            n_clicks=0,
-            style=BUTTON_STYLE
-        ),
-        html.Div(id='greeks-output', style={'margin': '20px 0'})
-    ])
+        ], style={'flex': '4', 'margin-right': '20px'}),
+        
+        # Sidebar with parameters
+        html.Div([
+            html.Div([
+                html.H4('Option Parameters', style={'color': '#34495e', 'margin-bottom': '15px'}),
+                create_parameter_input("Underlying Price (S):", 'greek-underlying', 100),
+                create_parameter_input("Strike Price (K):", 'greek-strike', 100),
+                create_parameter_input("Time to Maturity (T):", 'greek-time-maturity', 1),
+                create_parameter_input("Current Time (t):", 'greek-current-time', 0),
+                create_parameter_input("Volatility (σ):", 'greek-volatility', 0.2),
+                create_parameter_input("Risk Free Rate (r):", 'greek-risk-free', 0.05),
+                html.Label("Option Type:", style={'font-weight': 'bold', 'margin': '5px 0'}),
+                dcc.Dropdown(
+                    id='greek-option-type',
+                    options=[
+                        {'label': 'Call', 'value': 'call'},
+                        {'label': 'Put', 'value': 'put'}
+                    ],
+                    value='call',
+                    style={'margin': '5px 0'}
+                )
+            ], style={
+                **INPUT_CONTAINER_STYLE,
+                'position': 'sticky',
+                'top': '20px'
+            })
+        ], style={
+            'flex': '1',
+            'min-width': '200px',
+            'max-width': '300px',
+            'margin-top': '60px'  # Align with content below main heading
+        })
+    ], style={
+        'display': 'flex',
+        'flex-direction': 'row',
+        'gap': '10px',
+        'align-items': 'flex-start',
+        'width': '100%',
+        'height': '100%'
+    })
