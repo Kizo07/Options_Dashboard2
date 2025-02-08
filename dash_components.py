@@ -108,18 +108,26 @@ def create_trading_strategies_tab():
         html.Div([
             html.H3('Trading Strategies', style={'color': '#2c3e50'}),
             html.Div([
-                create_instrument_input(1),
-                create_instrument_input(2),
-                create_instrument_input(3),
-                create_instrument_input(4)
-            ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '10px', 'margin': '20px 0'}),
+                # First row of instruments
+                html.Div([
+                    create_instrument_input(1),
+                    create_instrument_input(2),
+                    create_instrument_input(3),
+                ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '10px', 'margin': '10px 0'}),
+                # Second row of instruments
+                html.Div([
+                    create_instrument_input(4),
+                    create_instrument_input(5),
+                    create_instrument_input(6),
+                ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '10px', 'margin': '10px 0'}),
+            ]),
             html.Button(
                 'Update Strategy',
                 id='update-strategy',
                 n_clicks=0,
                 style=BUTTON_STYLE
             ),
-            dcc.Graph(id='strategy-graph', style={'height': '75vh'})  # Make graph taller
+            dcc.Graph(id='strategy-graph', style={'height': '65vh'})  # Slightly shorter to accommodate more instruments
         ], style={'flex': '4', 'margin-right': '20px'}),
         
         # Sidebar with market parameters

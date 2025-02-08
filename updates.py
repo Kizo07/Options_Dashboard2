@@ -37,6 +37,12 @@ def register_callbacks(app):
             State('instrument-4-type', 'value'),
             State('instrument-4-strike', 'value'),
             State('instrument-4-position', 'value'),
+            State('instrument-5-type', 'value'),
+            State('instrument-5-strike', 'value'),
+            State('instrument-5-position', 'value'),
+            State('instrument-6-type', 'value'),
+            State('instrument-6-strike', 'value'),
+            State('instrument-6-position', 'value'),
             State('underlying-price', 'value'),
             State('time-maturity', 'value'),
             State('current-time', 'value'),
@@ -49,6 +55,8 @@ def register_callbacks(app):
                        instr2_type, instr2_strike, instr2_position,
                        instr3_type, instr3_strike, instr3_position,
                        instr4_type, instr4_strike, instr4_position,
+                       instr5_type, instr5_strike, instr5_position,
+                       instr6_type, instr6_strike, instr6_position,
                        S, T, t, sigma, r):
         if None in [S, T, t, sigma, r]:
             return go.Figure()
@@ -58,7 +66,9 @@ def register_callbacks(app):
             (instr1_type, instr1_strike, instr1_position),
             (instr2_type, instr2_strike, instr2_position),
             (instr3_type, instr3_strike, instr3_position),
-            (instr4_type, instr4_strike, instr4_position)
+            (instr4_type, instr4_strike, instr4_position),
+            (instr5_type, instr5_strike, instr5_position),
+            (instr6_type, instr6_strike, instr6_position)
         ]
         
         for inst_type, strike, position in instrument_inputs:
