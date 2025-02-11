@@ -217,5 +217,277 @@ class PortfolioPlotter:
 
         return fig_delta_S, fig_delta_tau, fig_delta_sigma
 
+    def plot_theta_analysis(self, instrument, S_range, T, t, sigma, r):
+        """
+        Plot theta sensitivity analysis charts.
+        
+        Parameters:
+        - instrument: Option instrument
+        - S_range: Range of underlying prices
+        - T, t, sigma, r: Other market parameters
+        
+        Returns:
+        - tuple of four Plotly figures (theta_vs_S, theta_vs_tau, theta_vs_sigma, theta_vs_r)
+        """
+        # Theta vs S
+        thetas = [instrument.compute_greeks(S, T, t, sigma, r)['Theta'] for S in S_range]
+        fig_theta_S = go.Figure()
+        fig_theta_S.add_trace(go.Scatter(x=S_range, y=thetas, mode='lines', name='Theta'))
+        fig_theta_S.update_layout(
+            title="Theta vs Underlying Price",
+            xaxis_title="Underlying Price (S)",
+            yaxis_title="Theta",
+            template="plotly_white",
+            height=250
+        )
+
+        # Theta vs tau (T-t)
+        tau_range = np.linspace(0.1, 2, 100)  # Time to maturity from 0.1 to 2 years
+        thetas_tau = [instrument.compute_greeks(S_range[len(S_range)//2], tau + t, t, sigma, r)['Theta'] 
+                      for tau in tau_range]
+        fig_theta_tau = go.Figure()
+        fig_theta_tau.add_trace(go.Scatter(x=tau_range, y=thetas_tau, mode='lines', name='Theta'))
+        fig_theta_tau.update_layout(
+            title="Theta vs Time to Maturity",
+            xaxis_title="Time to Maturity (τ)",
+            yaxis_title="Theta",
+            template="plotly_white",
+            height=250
+        )
+
+        # Theta vs sigma
+        sigma_range = np.linspace(0.1, 0.8, 100)  # Volatility from 10% to 80%
+        thetas_sigma = [instrument.compute_greeks(S_range[len(S_range)//2], T, t, sig, r)['Theta'] 
+                        for sig in sigma_range]
+        fig_theta_sigma = go.Figure()
+        fig_theta_sigma.add_trace(go.Scatter(x=sigma_range, y=thetas_sigma, mode='lines', name='Theta'))
+        fig_theta_sigma.update_layout(
+            title="Theta vs Volatility",
+            xaxis_title="Volatility (σ)",
+            yaxis_title="Theta",
+            template="plotly_white",
+            height=250
+        )
+
+        # Theta vs r
+        r_range = np.linspace(0.01, 0.1, 100)  # Risk-free rate from 1% to 10%
+        thetas_r = [instrument.compute_greeks(S_range[len(S_range)//2], T, t, sigma, r_val)['Theta'] 
+                    for r_val in r_range]
+        fig_theta_r = go.Figure()
+        fig_theta_r.add_trace(go.Scatter(x=r_range, y=thetas_r, mode='lines', name='Theta'))
+        fig_theta_r.update_layout(
+            title="Theta vs Risk-Free Rate",
+            xaxis_title="Risk-Free Rate (r)",
+            yaxis_title="Theta",
+            template="plotly_white",
+            height=250
+        )
+
+        return fig_theta_S, fig_theta_tau, fig_theta_sigma, fig_theta_r
+
+    def plot_gamma_analysis(self, instrument, S_range, T, t, sigma, r):
+        """
+        Plot gamma sensitivity analysis charts.
+        
+        Parameters:
+        - instrument: Option instrument
+        - S_range: Range of underlying prices
+        - T, t, sigma, r: Other market parameters
+        
+        Returns:
+        - tuple of four Plotly figures (gamma_vs_S, gamma_vs_tau, gamma_vs_sigma, gamma_vs_r)
+        """
+        # Gamma vs S
+        gammas = [instrument.compute_greeks(S, T, t, sigma, r)['Gamma'] for S in S_range]
+        fig_gamma_S = go.Figure()
+        fig_gamma_S.add_trace(go.Scatter(x=S_range, y=gammas, mode='lines', name='Gamma'))
+        fig_gamma_S.update_layout(
+            title="Gamma vs Underlying Price",
+            xaxis_title="Underlying Price (S)",
+            yaxis_title="Gamma",
+            template="plotly_white",
+            height=250
+        )
+
+        # Gamma vs tau (T-t)
+        tau_range = np.linspace(0.1, 2, 100)  # Time to maturity from 0.1 to 2 years
+        gammas_tau = [instrument.compute_greeks(S_range[len(S_range)//2], tau + t, t, sigma, r)['Gamma'] 
+                      for tau in tau_range]
+        fig_gamma_tau = go.Figure()
+        fig_gamma_tau.add_trace(go.Scatter(x=tau_range, y=gammas_tau, mode='lines', name='Gamma'))
+        fig_gamma_tau.update_layout(
+            title="Gamma vs Time to Maturity",
+            xaxis_title="Time to Maturity (τ)",
+            yaxis_title="Gamma",
+            template="plotly_white",
+            height=250
+        )
+
+        # Gamma vs sigma
+        sigma_range = np.linspace(0.1, 0.8, 100)  # Volatility from 10% to 80%
+        gammas_sigma = [instrument.compute_greeks(S_range[len(S_range)//2], T, t, sig, r)['Gamma'] 
+                        for sig in sigma_range]
+        fig_gamma_sigma = go.Figure()
+        fig_gamma_sigma.add_trace(go.Scatter(x=sigma_range, y=gammas_sigma, mode='lines', name='Gamma'))
+        fig_gamma_sigma.update_layout(
+            title="Gamma vs Volatility",
+            xaxis_title="Volatility (σ)",
+            yaxis_title="Gamma",
+            template="plotly_white",
+            height=250
+        )
+
+        # Gamma vs r
+        r_range = np.linspace(0.01, 0.1, 100)  # Risk-free rate from 1% to 10%
+        gammas_r = [instrument.compute_greeks(S_range[len(S_range)//2], T, t, sigma, r_val)['Gamma'] 
+                    for r_val in r_range]
+        fig_gamma_r = go.Figure()
+        fig_gamma_r.add_trace(go.Scatter(x=r_range, y=gammas_r, mode='lines', name='Gamma'))
+        fig_gamma_r.update_layout(
+            title="Gamma vs Risk-Free Rate",
+            xaxis_title="Risk-Free Rate (r)",
+            yaxis_title="Gamma",
+            template="plotly_white",
+            height=250
+        )
+
+        return fig_gamma_S, fig_gamma_tau, fig_gamma_sigma, fig_gamma_r
+
+    def plot_vega_analysis(self, instrument, S_range, T, t, sigma, r):
+        """
+        Plot vega sensitivity analysis charts.
+        
+        Parameters:
+        - instrument: Option instrument
+        - S_range: Range of underlying prices
+        - T, t, sigma, r: Other market parameters
+        
+        Returns:
+        - tuple of four Plotly figures (vega_vs_S, vega_vs_tau, vega_vs_sigma, vega_vs_r)
+        """
+        # Vega vs S
+        vegas = [instrument.compute_greeks(S, T, t, sigma, r)['Vega'] for S in S_range]
+        fig_vega_S = go.Figure()
+        fig_vega_S.add_trace(go.Scatter(x=S_range, y=vegas, mode='lines', name='Vega'))
+        fig_vega_S.update_layout(
+            title="Vega vs Underlying Price",
+            xaxis_title="Underlying Price (S)",
+            yaxis_title="Vega",
+            template="plotly_white",
+            height=250
+        )
+
+        # Vega vs tau (T-t)
+        tau_range = np.linspace(0.1, 2, 100)  # Time to maturity from 0.1 to 2 years
+        vegas_tau = [instrument.compute_greeks(S_range[len(S_range)//2], tau + t, t, sigma, r)['Vega'] 
+                      for tau in tau_range]
+        fig_vega_tau = go.Figure()
+        fig_vega_tau.add_trace(go.Scatter(x=tau_range, y=vegas_tau, mode='lines', name='Vega'))
+        fig_vega_tau.update_layout(
+            title="Vega vs Time to Maturity",
+            xaxis_title="Time to Maturity (τ)",
+            yaxis_title="Vega",
+            template="plotly_white",
+            height=250
+        )
+
+        # Vega vs sigma
+        sigma_range = np.linspace(0.1, 0.8, 100)  # Volatility from 10% to 80%
+        vegas_sigma = [instrument.compute_greeks(S_range[len(S_range)//2], T, t, sig, r)['Vega'] 
+                        for sig in sigma_range]
+        fig_vega_sigma = go.Figure()
+        fig_vega_sigma.add_trace(go.Scatter(x=sigma_range, y=vegas_sigma, mode='lines', name='Vega'))
+        fig_vega_sigma.update_layout(
+            title="Vega vs Volatility",
+            xaxis_title="Volatility (σ)",
+            yaxis_title="Vega",
+            template="plotly_white",
+            height=250
+        )
+
+        # Vega vs r
+        r_range = np.linspace(0.01, 0.1, 100)  # Risk-free rate from 1% to 10%
+        vegas_r = [instrument.compute_greeks(S_range[len(S_range)//2], T, t, sigma, r_val)['Vega'] 
+                    for r_val in r_range]
+        fig_vega_r = go.Figure()
+        fig_vega_r.add_trace(go.Scatter(x=r_range, y=vegas_r, mode='lines', name='Vega'))
+        fig_vega_r.update_layout(
+            title="Vega vs Risk-Free Rate",
+            xaxis_title="Risk-Free Rate (r)",
+            yaxis_title="Vega",
+            template="plotly_white",
+            height=250
+        )
+
+        return fig_vega_S, fig_vega_tau, fig_vega_sigma, fig_vega_r
+
+    def plot_rho_analysis(self, instrument, S_range, T, t, sigma, r):
+        """
+        Plot rho sensitivity analysis charts.
+        
+        Parameters:
+        - instrument: Option instrument
+        - S_range: Range of underlying prices
+        - T, t, sigma, r: Other market parameters
+        
+        Returns:
+        - tuple of four Plotly figures (rho_vs_S, rho_vs_tau, rho_vs_sigma, rho_vs_r)
+        """
+        # Rho vs S
+        rhos = [instrument.compute_greeks(S, T, t, sigma, r)['Rho'] for S in S_range]
+        fig_rho_S = go.Figure()
+        fig_rho_S.add_trace(go.Scatter(x=S_range, y=rhos, mode='lines', name='Rho'))
+        fig_rho_S.update_layout(
+            title="Rho vs Underlying Price",
+            xaxis_title="Underlying Price (S)",
+            yaxis_title="Rho",
+            template="plotly_white",
+            height=250
+        )
+
+        # Rho vs tau (T-t)
+        tau_range = np.linspace(0.1, 2, 100)  # Time to maturity from 0.1 to 2 years
+        rhos_tau = [instrument.compute_greeks(S_range[len(S_range)//2], tau + t, t, sigma, r)['Rho'] 
+                    for tau in tau_range]
+        fig_rho_tau = go.Figure()
+        fig_rho_tau.add_trace(go.Scatter(x=tau_range, y=rhos_tau, mode='lines', name='Rho'))
+        fig_rho_tau.update_layout(
+            title="Rho vs Time to Maturity",
+            xaxis_title="Time to Maturity (τ)",
+            yaxis_title="Rho",
+            template="plotly_white",
+            height=250
+        )
+
+        # Rho vs sigma
+        sigma_range = np.linspace(0.1, 0.8, 100)  # Volatility from 10% to 80%
+        rhos_sigma = [instrument.compute_greeks(S_range[len(S_range)//2], T, t, sig, r)['Rho'] 
+                      for sig in sigma_range]
+        fig_rho_sigma = go.Figure()
+        fig_rho_sigma.add_trace(go.Scatter(x=sigma_range, y=rhos_sigma, mode='lines', name='Rho'))
+        fig_rho_sigma.update_layout(
+            title="Rho vs Volatility",
+            xaxis_title="Volatility (σ)",
+            yaxis_title="Rho",
+            template="plotly_white",
+            height=250
+        )
+
+        # Rho vs r
+        r_range = np.linspace(0.01, 0.1, 100)  # Risk-free rate from 1% to 10%
+        rhos_r = [instrument.compute_greeks(S_range[len(S_range)//2], T, t, sigma, r_val)['Rho'] 
+                  for r_val in r_range]
+        fig_rho_r = go.Figure()
+        fig_rho_r.add_trace(go.Scatter(x=r_range, y=rhos_r, mode='lines', name='Rho'))
+        fig_rho_r.update_layout(
+            title="Rho vs Risk-Free Rate",
+            xaxis_title="Risk-Free Rate (r)",
+            yaxis_title="Rho",
+            template="plotly_white",
+            height=250
+        )
+
+        return fig_rho_S, fig_rho_tau, fig_rho_sigma, fig_rho_r
+
 
 

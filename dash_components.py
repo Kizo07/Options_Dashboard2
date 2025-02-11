@@ -234,11 +234,44 @@ def create_option_greeks_tab():
                     'box-shadow': '0 2px 4px rgba(0,0,0,0.1)',
                 }
             ),
-            # Add graphs for delta analysis
+            # Delta analysis charts
+            html.H4('Delta Sensitivity', style={'color': '#34495e', 'margin-top': '20px'}),
             html.Div([
-                dcc.Graph(id='delta-vs-s', style={'height': '30vh'}),
-                dcc.Graph(id='delta-vs-tau', style={'height': '30vh'}),
-                dcc.Graph(id='delta-vs-sigma', style={'height': '30vh'})
+                dcc.Graph(id='delta-vs-s', style={'height': '25vh'}),
+                dcc.Graph(id='delta-vs-tau', style={'height': '25vh'}),
+                dcc.Graph(id='delta-vs-sigma', style={'height': '25vh'})
+            ]),
+            # Gamma analysis charts
+            html.H4('Gamma Sensitivity', style={'color': '#34495e', 'margin-top': '20px'}),
+            html.Div([
+                dcc.Graph(id='gamma-vs-s', style={'height': '25vh'}),
+                dcc.Graph(id='gamma-vs-tau', style={'height': '25vh'}),
+                dcc.Graph(id='gamma-vs-sigma', style={'height': '25vh'}),
+                dcc.Graph(id='gamma-vs-r', style={'height': '25vh'})
+            ]),
+            # Vega analysis charts
+            html.H4('Vega Sensitivity', style={'color': '#34495e', 'margin-top': '20px'}),
+            html.Div([
+                dcc.Graph(id='vega-vs-s', style={'height': '25vh'}),
+                dcc.Graph(id='vega-vs-tau', style={'height': '25vh'}),
+                dcc.Graph(id='vega-vs-sigma', style={'height': '25vh'}),
+                dcc.Graph(id='vega-vs-r', style={'height': '25vh'})
+            ]),
+            # Rho analysis charts
+            html.H4('Rho Sensitivity', style={'color': '#34495e', 'margin-top': '20px'}),
+            html.Div([
+                dcc.Graph(id='rho-vs-s', style={'height': '25vh'}),
+                dcc.Graph(id='rho-vs-tau', style={'height': '25vh'}),
+                dcc.Graph(id='rho-vs-sigma', style={'height': '25vh'}),
+                dcc.Graph(id='rho-vs-r', style={'height': '25vh'})
+            ]),
+            # Theta analysis charts
+            html.H4('Theta Sensitivity', style={'color': '#34495e', 'margin-top': '20px'}),
+            html.Div([
+                dcc.Graph(id='theta-vs-s', style={'height': '25vh'}),
+                dcc.Graph(id='theta-vs-tau', style={'height': '25vh'}),
+                dcc.Graph(id='theta-vs-sigma', style={'height': '25vh'}),
+                dcc.Graph(id='theta-vs-r', style={'height': '25vh'})
             ])
         ], style={'flex': '4', 'margin-right': '20px'}),
         

@@ -153,31 +153,67 @@ def register_callbacks(app):
         [Output('greeks-output', 'children'),
          Output('delta-vs-s', 'figure'),
          Output('delta-vs-tau', 'figure'),
-         Output('delta-vs-sigma', 'figure')],
+         Output('delta-vs-sigma', 'figure'),
+         Output('gamma-vs-s', 'figure'),
+         Output('gamma-vs-tau', 'figure'),
+         Output('gamma-vs-sigma', 'figure'),
+         Output('gamma-vs-r', 'figure'),
+         Output('vega-vs-s', 'figure'),
+         Output('vega-vs-tau', 'figure'),
+         Output('vega-vs-sigma', 'figure'),
+         Output('vega-vs-r', 'figure'),
+         Output('rho-vs-s', 'figure'),
+         Output('rho-vs-tau', 'figure'),
+         Output('rho-vs-sigma', 'figure'),
+         Output('rho-vs-r', 'figure'),
+         Output('theta-vs-s', 'figure'),
+         Output('theta-vs-tau', 'figure'),
+         Output('theta-vs-sigma', 'figure'),
+         Output('theta-vs-r', 'figure')],
         [Input('compute-greeks', 'n_clicks')],
-        [
-            State('greek-underlying', 'value'),
-            State('greek-strike', 'value'),
-            State('greek-time-maturity', 'value'),
-            State('greek-current-time', 'value'),
-            State('greek-volatility', 'value'),
-            State('greek-risk-free', 'value'),
-            State('greek-option-type', 'value')
-        ]
+        [State('greek-underlying', 'value'),
+         State('greek-strike', 'value'),
+         State('greek-time-maturity', 'value'),
+         State('greek-current-time', 'value'),
+         State('greek-volatility', 'value'),
+         State('greek-risk-free', 'value'),
+         State('greek-option-type', 'value')]
     )
     def update_greeks(n_clicks, S, K, T, t, sigma, r, option_type):
         if None in [S, K, T, t, sigma, r]:
-            return [], go.Figure(), go.Figure(), go.Figure()
+            return [go.Figure() for _ in range(20)]  # Return empty figures for all plots
             
         instrument = Instrument(option_type, K)
         greeks = instrument.compute_greeks(S, T, t, sigma, r)
         greeks_output = [html.P(f"{key}: {value:.4f}") for key, value in greeks.items()]
         
-        # Generate delta analysis plots
+        # Generate analysis plots
         S_range = np.linspace(max(0.1, K/2), 1.5*K, 100)
         plotter = PortfolioPlotter([instrument])
+        
         delta_s, delta_tau, delta_sigma = plotter.plot_delta_analysis(
             instrument, S_range, T, t, sigma, r
         )
         
-        return greeks_output, delta_s, delta_tau, delta_sigma
+        gamma_s, gamma_tau, gamma_sigma, gamma_r = plotter.plot_gamma_analysis(
+            instrument, S_range, T, t, sigma, r
+        )
+        
+        vega_s, vega_tau, vega_sigma, vega_r = plotter.plot_vega_analysis(
+            instrument, S_range, T, t, sigma, r
+        )
+        
+        rho_s, rho_tau, rho_sigma, rho_r = plotter.plot_rho_analysis(
+            instrument, S_range, T, t, sigma, r
+        )
+        
+        theta_s, theta_tau, theta_sigma, theta_r = plotter.plot_theta_analysis(
+            instrument, S_range, T, t, sigma, r
+        )
+        
+        return (greeks_output, 
+                delta_s, delta_tau, delta_sigma,
+                gamma_s, gamma_tau, gamma_sigma, gamma_r,
+                vega_s, vega_tau, vega_sigma, vega_r,
+                rho_s, rho_tau, rho_sigma, rho_r,
+                theta_s, theta_tau, theta_sigma, theta_r)
