@@ -215,7 +215,7 @@ def create_single_option_analysis_tab():
 def create_option_greeks_tab():
     """Create the layout for the Option Greeks tab."""
     return html.Div([
-        # Main content area with Greeks output
+        # Main content area with Greeks output and charts
         html.Div([
             html.H3('Option Greeks', style={'color': '#2c3e50'}),
             html.Button(
@@ -232,9 +232,14 @@ def create_option_greeks_tab():
                     'background': 'white',
                     'border-radius': '8px',
                     'box-shadow': '0 2px 4px rgba(0,0,0,0.1)',
-                    'min-height': '75vh'
                 }
-            )
+            ),
+            # Add graphs for delta analysis
+            html.Div([
+                dcc.Graph(id='delta-vs-s', style={'height': '30vh'}),
+                dcc.Graph(id='delta-vs-tau', style={'height': '30vh'}),
+                dcc.Graph(id='delta-vs-sigma', style={'height': '30vh'})
+            ])
         ], style={'flex': '4', 'margin-right': '20px'}),
         
         # Sidebar with parameters
@@ -266,7 +271,7 @@ def create_option_greeks_tab():
             'flex': '1',
             'min-width': '200px',
             'max-width': '300px',
-            'margin-top': '60px'  # Align with content below main heading
+            'margin-top': '60px'
         })
     ], style={
         'display': 'flex',

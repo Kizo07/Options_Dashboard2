@@ -150,7 +150,10 @@ def register_callbacks(app):
             return go.Figure(), go.Figure()
 
     @app.callback(
-        Output('greeks-output', 'children'),
+        [Output('greeks-output', 'children'),
+         Output('delta-vs-s', 'figure'),
+         Output('delta-vs-tau', 'figure'),
+         Output('delta-vs-sigma', 'figure')],
         [Input('compute-greeks', 'n_clicks')],
         [
             State('greek-underlying', 'value'),
@@ -163,6 +166,18 @@ def register_callbacks(app):
         ]
     )
     def update_greeks(n_clicks, S, K, T, t, sigma, r, option_type):
+        if None in [S, K, T, t, sigma, r]:
+            return [], go.Figure(), go.Figure(), go.Figure()
+            
         instrument = Instrument(option_type, K)
         greeks = instrument.compute_greeks(S, T, t, sigma, r)
-        return [html.P(f"{key}: {value:.4f}") for key, value in greeks.items()]
+        greeks_output = [html.P(f"{key}: {value:.4f}") for key, value in greeks.items()]
+        
+        # Generate delta analysis plots
+        S_range = np.linspace(max(0.1, K/2), 1.5*K, 100)
+        plotter = PortfolioPlotter([instrument])
+        delta_s, delta_tau, delta_sigma = plotter.plot_delta_analysis(
+            instrument, S_range, T, t, sigma, r
+        )
+        
+        return greeks_output, delta_s, delta_tau, delta_sigma

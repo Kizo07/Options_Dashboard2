@@ -163,5 +163,59 @@ class PortfolioPlotter:
         
         return fig_diff, fig_ratio
 
+    def plot_delta_analysis(self, instrument, S_range, T, t, sigma, r):
+        """
+        Plot delta sensitivity analysis charts.
+        
+        Parameters:
+        - instrument: Option instrument
+        - S_range: Range of underlying prices
+        - T, t, sigma, r: Other market parameters
+        
+        Returns:
+        - tuple of three Plotly figures (delta_vs_S, delta_vs_tau, delta_vs_sigma)
+        """
+        # Delta vs S
+        deltas = [instrument.compute_greeks(S, T, t, sigma, r)['Delta'] for S in S_range]
+        fig_delta_S = go.Figure()
+        fig_delta_S.add_trace(go.Scatter(x=S_range, y=deltas, mode='lines', name='Delta'))
+        fig_delta_S.update_layout(
+            title="Delta vs Underlying Price",
+            xaxis_title="Underlying Price (S)",
+            yaxis_title="Delta",
+            template="plotly_white",
+            height=250
+        )
+
+        # Delta vs tau (T-t)
+        tau_range = np.linspace(0.1, 2, 100)  # Time to maturity from 0.1 to 2 years
+        deltas_tau = [instrument.compute_greeks(S_range[len(S_range)//2], tau + t, t, sigma, r)['Delta'] 
+                      for tau in tau_range]
+        fig_delta_tau = go.Figure()
+        fig_delta_tau.add_trace(go.Scatter(x=tau_range, y=deltas_tau, mode='lines', name='Delta'))
+        fig_delta_tau.update_layout(
+            title="Delta vs Time to Maturity",
+            xaxis_title="Time to Maturity (τ)",
+            yaxis_title="Delta",
+            template="plotly_white",
+            height=250
+        )
+
+        # Delta vs sigma
+        sigma_range = np.linspace(0.1, 0.8, 100)  # Volatility from 10% to 80%
+        deltas_sigma = [instrument.compute_greeks(S_range[len(S_range)//2], T, t, sig, r)['Delta'] 
+                        for sig in sigma_range]
+        fig_delta_sigma = go.Figure()
+        fig_delta_sigma.add_trace(go.Scatter(x=sigma_range, y=deltas_sigma, mode='lines', name='Delta'))
+        fig_delta_sigma.update_layout(
+            title="Delta vs Volatility",
+            xaxis_title="Volatility (σ)",
+            yaxis_title="Delta",
+            template="plotly_white",
+            height=250
+        )
+
+        return fig_delta_S, fig_delta_tau, fig_delta_sigma
+
 
 
