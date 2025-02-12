@@ -172,44 +172,142 @@ def register_callbacks(app):
          Output('theta-vs-r', 'figure')],
         [Input('compute-greeks', 'n_clicks')],
         [State('greek-underlying', 'value'),
-         State('greek-strike', 'value'),
-         State('greek-time-maturity', 'value'),
+         State('greek-strike-1', 'value'),
+         State('greek-strike-2', 'value'),
+         State('greek-time-maturity-1', 'value'),
+         State('greek-time-maturity-2', 'value'),
          State('greek-current-time', 'value'),
          State('greek-volatility', 'value'),
          State('greek-risk-free', 'value'),
-         State('greek-option-type', 'value')]
+         State('greek-option-type-1', 'value'),
+         State('greek-option-type-2', 'value')]
     )
-    def update_greeks(n_clicks, S, K, T, t, sigma, r, option_type):
-        if None in [S, K, T, t, sigma, r]:
-            return [go.Figure() for _ in range(20)]  # Return empty figures for all plots
+    def update_greeks(n_clicks, S, K1, K2, T1, T2, t, sigma, r, option_type_1, option_type_2):
+        if None in [S, K1, K2, T1, T2, t, sigma, r]:
+            return [go.Figure() for _ in range(20)]
             
-        instrument = Instrument(option_type, K)
-        greeks = instrument.compute_greeks(S, T, t, sigma, r)
-        greeks_output = [html.P(f"{key}: {value:.4f}") for key, value in greeks.items()]
+        instrument1 = Instrument(option_type_1, K1)
+        instrument2 = Instrument(option_type_2, K2)
+        
+        greeks1 = instrument1.compute_greeks(S, T1, t, sigma, r)
+        greeks2 = instrument2.compute_greeks(S, T2, t, sigma, r)
+        
+        greeks_output = [
+            html.H4(f"Instrument 1 ({option_type_1.capitalize()}, K={K1}, T={T1}):"),
+            *[html.P(f"{key}: {value:.4f}") for key, value in greeks1.items()],
+            html.H4(f"Instrument 2 ({option_type_2.capitalize()}, K={K2}, T={T2}):"),
+            *[html.P(f"{key}: {value:.4f}") for key, value in greeks2.items()]
+        ]
         
         # Generate analysis plots
-        S_range = np.linspace(max(0.1, K/2), 1.5*K, 100)
-        plotter = PortfolioPlotter([instrument])
+        S_range = np.linspace(max(0.1, min(K1, K2)/2), 1.5*max(K1, K2), 100)
+        plotter = PortfolioPlotter([instrument1, instrument2])
         
+        # Update plotting functions to handle multiple instruments with different T
+        def add_second_trace(fig, y_values, name):
+            y_values = np.array(y_values)
+            instrument1_y = np.array(fig.data[0].y)
+            fig.add_trace(go.Scatter(
+                x=fig.data[0].x,
+                y=y_values,
+                mode='lines',
+                name=f'{name} (Instrument 2)'
+            ))
+            fig.add_trace(go.Scatter(
+                x=fig.data[0].x,
+                y=instrument1_y + y_values,
+                mode='lines',
+                name=f'{name} (Portfolio)'
+            ))
+            fig.data[0].name = f'{name} (Instrument 1)'
+            return fig
+        
+        
+        # Generate all plots with both instruments using their respective T values
         delta_s, delta_tau, delta_sigma = plotter.plot_delta_analysis(
-            instrument, S_range, T, t, sigma, r
+            instrument1, S_range, T1, t, sigma, r
+        )
+        delta_s2, delta_tau2, delta_sigma2 = plotter.plot_delta_analysis(
+            instrument2, S_range, T2, t, sigma, r
         )
         
+        # Add second instrument traces to each plot
+        for fig1, fig2, name in [
+            (delta_s, delta_s2, 'Delta'),
+            (delta_tau, delta_tau2, 'Delta'),
+            (delta_sigma, delta_sigma2, 'Delta')
+        ]:
+            add_second_trace(fig1, fig2.data[0].y, name)
+            
+            
+        
+        # Repeat for other Greeks...
         gamma_s, gamma_tau, gamma_sigma, gamma_r = plotter.plot_gamma_analysis(
-            instrument, S_range, T, t, sigma, r
+            instrument1, S_range, T1, t, sigma, r
         )
+        gamma_s2, gamma_tau2, gamma_sigma2, gamma_r2 = plotter.plot_gamma_analysis(
+            instrument2, S_range, T2, t, sigma, r
+        )
+        
+        for fig1, fig2, name in [
+            (gamma_s, gamma_s2, 'Gamma'),
+            (gamma_tau, gamma_tau2, 'Gamma'),
+            (gamma_sigma, gamma_sigma2, 'Gamma'),
+            (gamma_r, gamma_r2, 'Gamma')
+        ]:
+            add_second_trace(fig1, fig2.data[0].y, name)
+            
+        
+        # Similar updates for vega, rho, and theta...
+        # (Add the same pattern for the remaining Greeks)
         
         vega_s, vega_tau, vega_sigma, vega_r = plotter.plot_vega_analysis(
-            instrument, S_range, T, t, sigma, r
+            instrument1, S_range, T1, t, sigma, r
+        )
+        vega_s2, vega_tau2, vega_sigma2, vega_r2 = plotter.plot_vega_analysis(
+            instrument2, S_range, T2, t, sigma, r
         )
         
+        for fig1, fig2, name in [
+            (vega_s, vega_s2, 'Vega'),
+            (vega_tau, vega_tau2, 'Vega'),
+            (vega_sigma, vega_sigma2, 'Vega'),
+            (vega_r, vega_r2, 'Vega')
+        ]:
+            add_second_trace(fig1, fig2.data[0].y, name)
+            
+            
         rho_s, rho_tau, rho_sigma, rho_r = plotter.plot_rho_analysis(
-            instrument, S_range, T, t, sigma, r
+            instrument1, S_range, T1, t, sigma, r
+        )
+        rho_s2, rho_tau2, rho_sigma2, rho_r2 = plotter.plot_rho_analysis(
+            instrument2, S_range, T2, t, sigma, r
         )
         
+        for fig1, fig2, name in [
+            (rho_s, rho_s2, 'Rho'),
+            (rho_tau, rho_tau2, 'Rho'),
+            (rho_sigma, rho_sigma2, 'Rho'),
+            (rho_r, rho_r2, 'Rho')
+        ]:
+            add_second_trace(fig1, fig2.data[0].y, name)
+            
+            
         theta_s, theta_tau, theta_sigma, theta_r = plotter.plot_theta_analysis(
-            instrument, S_range, T, t, sigma, r
+            instrument1, S_range, T1, t, sigma, r
         )
+        theta_s2, theta_tau2, theta_sigma2, theta_r2 = plotter.plot_theta_analysis(
+            instrument2, S_range, T2, t, sigma, r
+        )
+        
+        for fig1, fig2, name in [
+            (theta_s, theta_s2, 'Theta'),
+            (theta_tau, theta_tau2, 'Theta'),
+            (theta_sigma, theta_sigma2, 'Theta'),
+            (theta_r, theta_r2, 'Theta')
+        ]:
+            add_second_trace(fig1, fig2.data[0].y, name)
+            
         
         return (greeks_output, 
                 delta_s, delta_tau, delta_sigma,

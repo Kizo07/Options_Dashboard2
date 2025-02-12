@@ -218,99 +218,126 @@ def create_option_greeks_tab():
         # Main content area with Greeks output and charts
         html.Div([
             html.H3('Option Greeks', style={'color': '#2c3e50'}),
-            html.Button(
-                'Compute Greeks',
-                id='compute-greeks',
-                n_clicks=0,
-                style=BUTTON_STYLE
-            ),
-            html.Div(
-                id='greeks-output',
-                style={
-                    'margin': '20px 0',
-                    'padding': '20px',
-                    'background': 'white',
-                    'border-radius': '8px',
-                    'box-shadow': '0 2px 4px rgba(0,0,0,0.1)',
-                }
-            ),
-            # Delta analysis charts
-            html.H4('Delta Sensitivity', style={'color': '#34495e', 'margin-top': '20px'}),
+            # Add instrument selection and parameters in a horizontal layout
             html.Div([
-                dcc.Graph(id='delta-vs-s', style={'height': '25vh'}),
-                dcc.Graph(id='delta-vs-tau', style={'height': '25vh'}),
-                dcc.Graph(id='delta-vs-sigma', style={'height': '25vh'})
-            ]),
-            # Gamma analysis charts
-            html.H4('Gamma Sensitivity', style={'color': '#34495e', 'margin-top': '20px'}),
+                # Left side - Instruments with their parameters
+                html.Div([
+                    # Instrument 1
+                    html.Div([
+                        html.H4('Instrument 1', style={'color': '#34495e', 'margin-bottom': '5px'}),
+                        dcc.Dropdown(
+                            id='greek-option-type-1',
+                            options=[
+                                {'label': 'Call', 'value': 'call'},
+                                {'label': 'Put', 'value': 'put'}
+                            ],
+                            value='call',
+                            style={'margin': '5px 0'}
+                        ),
+                        create_parameter_input("K1:", 'greek-strike-1', 100),
+                        create_parameter_input("T1:", 'greek-time-maturity-1', 1),
+                    ], style={'flex': 1}),
+                    # Instrument 2
+                    html.Div([
+                        html.H4('Instrument 2', style={'color': '#34495e', 'margin-bottom': '5px'}),
+                        dcc.Dropdown(
+                            id='greek-option-type-2',
+                            options=[
+                                {'label': 'Call', 'value': 'call'},
+                                {'label': 'Put', 'value': 'put'}
+                            ],
+                            value='put',
+                            style={'margin': '5px 0'}
+                        ),
+                        create_parameter_input("K2:", 'greek-strike-2', 100),
+                        create_parameter_input("T2:", 'greek-time-maturity-2', 1),
+                    ], style={'flex': 1}),
+                ], style={'display': 'flex', 'gap': '20px', 'flex': 1}),
+                
+                # Right side - Common Parameters
+                html.Div([
+                    html.H4('Market Parameters', style={'color': '#34495e', 'margin-bottom': '5px'}),
+                    html.Div([
+                        create_parameter_input("S:", 'greek-underlying', 100),
+                        create_parameter_input("t:", 'greek-current-time', 0),
+                        create_parameter_input("σ:", 'greek-volatility', 0.2),
+                        create_parameter_input("r:", 'greek-risk-free', 0.05),
+                    ], style={'display': 'flex', 'gap': '20px', 'flex-wrap': 'wrap'}),
+                ], style={'flex': 1}),
+            ], style={'display': 'flex', 'gap': '20px', 'margin': '20px 0', 'align-items': 'flex-start'}),
+            
+            # Compute button and Greeks output in a row
             html.Div([
-                dcc.Graph(id='gamma-vs-s', style={'height': '25vh'}),
-                dcc.Graph(id='gamma-vs-tau', style={'height': '25vh'}),
-                dcc.Graph(id='gamma-vs-sigma', style={'height': '25vh'}),
-                dcc.Graph(id='gamma-vs-r', style={'height': '25vh'})
-            ]),
-            # Vega analysis charts
-            html.H4('Vega Sensitivity', style={'color': '#34495e', 'margin-top': '20px'}),
+                html.Button(
+                    'Compute Greeks',
+                    id='compute-greeks',
+                    n_clicks=0,
+                    style={**BUTTON_STYLE, 'margin': '0 20px 0 0'}
+                ),
+                html.Div(
+                    id='greeks-output',
+                    style={
+                        'flex': 1,
+                        'padding': '10px',
+                        'background': 'white',
+                        'border-radius': '8px',
+                        'box-shadow': '0 2px 4px rgba(0,0,0,0.1)',
+                        'display': 'flex',
+                        'gap': '20px'
+                    }
+                ),
+            ], style={'display': 'flex', 'align-items': 'center', 'margin': '20px 0'}),
+            
+            # Charts in a grid layout
             html.Div([
-                dcc.Graph(id='vega-vs-s', style={'height': '25vh'}),
-                dcc.Graph(id='vega-vs-tau', style={'height': '25vh'}),
-                dcc.Graph(id='vega-vs-sigma', style={'height': '25vh'}),
-                dcc.Graph(id='vega-vs-r', style={'height': '25vh'})
-            ]),
-            # Rho analysis charts
-            html.H4('Rho Sensitivity', style={'color': '#34495e', 'margin-top': '20px'}),
-            html.Div([
-                dcc.Graph(id='rho-vs-s', style={'height': '25vh'}),
-                dcc.Graph(id='rho-vs-tau', style={'height': '25vh'}),
-                dcc.Graph(id='rho-vs-sigma', style={'height': '25vh'}),
-                dcc.Graph(id='rho-vs-r', style={'height': '25vh'})
-            ]),
-            # Theta analysis charts
-            html.H4('Theta Sensitivity', style={'color': '#34495e', 'margin-top': '20px'}),
-            html.Div([
-                dcc.Graph(id='theta-vs-s', style={'height': '25vh'}),
-                dcc.Graph(id='theta-vs-tau', style={'height': '25vh'}),
-                dcc.Graph(id='theta-vs-sigma', style={'height': '25vh'}),
-                dcc.Graph(id='theta-vs-r', style={'height': '25vh'})
-            ])
-        ], style={'flex': '4', 'margin-right': '20px'}),
-        
-        # Sidebar with parameters
-        html.Div([
-            html.Div([
-                html.H4('Option Parameters', style={'color': '#34495e', 'margin-bottom': '15px'}),
-                create_parameter_input("Underlying Price (S):", 'greek-underlying', 100),
-                create_parameter_input("Strike Price (K):", 'greek-strike', 100),
-                create_parameter_input("Time to Maturity (T):", 'greek-time-maturity', 1),
-                create_parameter_input("Current Time (t):", 'greek-current-time', 0),
-                create_parameter_input("Volatility (σ):", 'greek-volatility', 0.2),
-                create_parameter_input("Risk Free Rate (r):", 'greek-risk-free', 0.05),
-                html.Label("Option Type:", style={'font-weight': 'bold', 'margin': '5px 0'}),
-                dcc.Dropdown(
-                    id='greek-option-type',
-                    options=[
-                        {'label': 'Call', 'value': 'call'},
-                        {'label': 'Put', 'value': 'put'}
-                    ],
-                    value='call',
-                    style={'margin': '5px 0'}
-                )
-            ], style={
-                **INPUT_CONTAINER_STYLE,
-                'position': 'sticky',
-                'top': '20px'
-            })
-        ], style={
-            'flex': '1',
-            'min-width': '200px',
-            'max-width': '300px',
-            'margin-top': '60px'
-        })
+                # Delta and Gamma row
+                html.Div([
+                    html.Div([
+                        html.H4('Delta Sensitivity', style={'color': '#34495e', 'margin': '10px 0'}),
+                        dcc.Graph(id='delta-vs-s', style={'height': '30vh'}),
+                        dcc.Graph(id='delta-vs-tau', style={'height': '30vh'}),
+                        dcc.Graph(id='delta-vs-sigma', style={'height': '30vh'}),
+                    ], style={'flex': 1}),
+                    html.Div([
+                        html.H4('Gamma Sensitivity', style={'color': '#34495e', 'margin': '10px 0'}),
+                        dcc.Graph(id='gamma-vs-s', style={'height': '30vh'}),
+                        dcc.Graph(id='gamma-vs-tau', style={'height': '30vh'}),
+                        dcc.Graph(id='gamma-vs-sigma', style={'height': '30vh'}),
+                        dcc.Graph(id='gamma-vs-r', style={'height': '30vh'}),
+                    ], style={'flex': 1}),
+                ], style={'display': 'flex', 'gap': '20px'}),
+                
+                # Vega and Rho row
+                html.Div([
+                    html.Div([
+                        html.H4('Vega Sensitivity', style={'color': '#34495e', 'margin': '10px 0'}),
+                        dcc.Graph(id='vega-vs-s', style={'height': '30vh'}),
+                        dcc.Graph(id='vega-vs-tau', style={'height': '30vh'}),
+                        dcc.Graph(id='vega-vs-sigma', style={'height': '30vh'}),
+                        dcc.Graph(id='vega-vs-r', style={'height': '30vh'}),
+                    ], style={'flex': 1}),
+                    html.Div([
+                        html.H4('Rho Sensitivity', style={'color': '#34495e', 'margin': '10px 0'}),
+                        dcc.Graph(id='rho-vs-s', style={'height': '30vh'}),
+                        dcc.Graph(id='rho-vs-tau', style={'height': '30vh'}),
+                        dcc.Graph(id='rho-vs-sigma', style={'height': '30vh'}),
+                        dcc.Graph(id='rho-vs-r', style={'height': '30vh'}),
+                    ], style={'flex': 1}),
+                ], style={'display': 'flex', 'gap': '20px'}),
+                
+                # Theta row
+                html.Div([
+                    html.H4('Theta Sensitivity', style={'color': '#34495e', 'margin': '10px 0'}),
+                    dcc.Graph(id='theta-vs-s', style={'height': '30vh'}),
+                    dcc.Graph(id='theta-vs-tau', style={'height': '30vh'}),
+                    dcc.Graph(id='theta-vs-sigma', style={'height': '30vh'}),
+                    dcc.Graph(id='theta-vs-r', style={'height': '30vh'}),
+                ]),
+            ], style={'margin-top': '20px'}),
+        ], style={'flex': '1', 'margin': '0 20px'})
     ], style={
         'display': 'flex',
-        'flex-direction': 'row',
-        'gap': '10px',
-        'align-items': 'flex-start',
         'width': '100%',
-        'height': '100%'
+        'height': '100%',
+        'overflow': 'auto'
     })
