@@ -84,7 +84,8 @@ def register_callbacks(app):
         
         # Create plotter and generate figure
         plotter = PortfolioPlotter(instruments)
-        S_min = max(0.1, S/2)
+        #S_min = max(0.1, S/2)
+        S_min = 0.01
         S_max = 2 * S
         
         # Plot both payoff and current value on the same figure

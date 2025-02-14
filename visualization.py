@@ -28,7 +28,7 @@ class PortfolioPlotter:
             - sigma: Volatility of the underlying asset.
             - num_points: Number of points in the stock price range.
             """
-            S_range = np.linspace(S_min, S_max, num_points)
+            S_range = np.linspace(0.01, S_max, num_points)
             fig = go.Figure()
 
             total_value = np.zeros_like(S_range)
@@ -71,7 +71,7 @@ class PortfolioPlotter:
         portfolio payoff over a range of underlying prices at expiration.
         """
         # Create an array of underlying prices from S_min to S_max.
-        S_range = np.linspace(float(S_min), float(S_max), num_points)
+        S_range = np.linspace(float(0.01), float(S_max), num_points)
         
         # Create a new Plotly figure.
         fig = go.Figure()
